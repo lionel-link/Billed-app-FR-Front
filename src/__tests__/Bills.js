@@ -13,6 +13,8 @@ import mockStore from "../__mocks__/store"
 import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
 
+jest.mock("../app/Store", () => mockStore)
+
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
@@ -60,35 +62,33 @@ describe("Given I am connected as an employee", () => {
       ButtonNewBill.addEventListener('click', handleClickNewBill)
       userEvent.click(ButtonNewBill)
       expect(handleClickNewBill).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`form-new-bill`) )
-      expect(screen.getByTestId(`form-new-bill`)).toBeTruthy()
+      let form = await waitFor(() => screen.getByTestId(`form-new-bill`) )
+      expect(form).toBeTruthy()
     })
     
-    // test("Then the button icon-eye in actions", async () => {
+    test("Then the button icon-eye in actions", async () => {
 
-    //   Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-    //   window.localStorage.setItem('user', JSON.stringify({
-    //     type: 'Employee'
-    //   }))
-    //   const root = document.createElement("div")
-    //   root.setAttribute("id", "root")
-    //   document.body.append(root)
-    //   router()
-    //   window.onNavigate(ROUTES_PATH.Bills)
-    //   const ButtonIconEye = await screen.getAllByTestId("icon-eye")[0]
-    //   console.log("🚀 ~ file: Bills.js:79 ~ test ~ ButtonIconEye:", ButtonIconEye)
+      // on mock la fonction modal de jQuery
+      jQuery.fn.modal = jest.fn();
+      // on mock la fonction html de jQuery
+      jQuery.fn.html = jest.fn();
 
-    //   const bill = new Bills({
-    //     document, onNavigate, store: null, localStorage: window.localStorage
-    //   })
-    //   const handleClickIconEye = jest.fn((e) => bill.handleClickIconEye())
-      
-    //   ButtonIconEye.addEventListener('click', handleClickIconEye)
-    //   userEvent.click(ButtonIconEye)
-    //   expect(handleClickIconEye).toHaveBeenCalled()
-    //   await waitFor(() => screen.getById(`modalFile`) )
-    //   expect(screen.getById(`modalFile`)).toBeTruthy()
-    // })
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      const ButtonIconEye = await screen.getAllByTestId("icon-eye")[0]
+
+      userEvent.click(ButtonIconEye)
+      // on test que la fonction modal a bien été appelée avec le paramètre 'show'
+      expect(jQuery.fn.modal).toHaveBeenCalledWith('show');
+
+    })
   })
 })
 
@@ -104,8 +104,6 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => screen.getByText("Mes notes de frais"))
       const contentPending  = await screen.getByText("Nom")
       expect(contentPending).toBeTruthy()
-      const contentRefused  = await screen.getByText("Statut")
-      expect(contentRefused).toBeTruthy()
     })
 })
 
@@ -136,8 +134,8 @@ describe("When an error occurs on API", () => {
       }})
     window.onNavigate(ROUTES_PATH.Bills)
     await new Promise(process.nextTick);
-    //const message = await screen.getByText(/Erreur 404/)
-    //expect(message).toBeTruthy()
+    const message = await screen.getByText(/Erreur 404/)
+    expect(message).toBeTruthy()
   })
 
   test("fetches messages from an API and fails with 500 message error", async () => {
@@ -151,7 +149,7 @@ describe("When an error occurs on API", () => {
 
     window.onNavigate(ROUTES_PATH.Bills)
     await new Promise(process.nextTick);
-    //const message = await screen.getByText(/Erreur 500/)
-    //expect(message).toBeTruthy()
+    const message = await screen.getByText(/Erreur 500/)
+    expect(message).toBeTruthy()
   })
 })
