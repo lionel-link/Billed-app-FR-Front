@@ -17,6 +17,7 @@ export default class NewBill {
     let billFilled = false
   }
   handleChangeFile = e => {
+    console.log("passing ")
     e.preventDefault()
     const inputFile = this.document.querySelector(`input[data-testid="file"]`)
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
@@ -77,6 +78,7 @@ export default class NewBill {
   }
 
   // not need to cover this function by tests
+  /* istanbul ignore next */
   updateBill = (bill) => {
     if (this.store) {
       this.store

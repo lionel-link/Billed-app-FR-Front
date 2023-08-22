@@ -55,8 +55,6 @@ describe("Given I am connected as an employee", () => {
       fireEvent.change(inputDatePicker, { target: { value: "2022-02-02" } });
       const inputAmount = screen.getByTestId("amount");
       fireEvent.change(inputAmount, { target: { value: "270" } });
-      //const inputVat = screen.getByTestId("vat");
-      //fireEvent.change(inputExpenseName, { target: { value: "Vol Paris Londres" } });
       const inputPct = screen.getByTestId("pct");
       fireEvent.change(inputPct, { target: { value: "20" } });
       const inputCommentary = screen.getByTestId("commentary");
@@ -92,26 +90,20 @@ describe("Given I am connected as an employee", () => {
       const inputFile = screen.getByTestId("file");
       console.log("🚀 ~ file: NewBill.js:92 ~ test ~ inputFile:", inputFile)
       const imageFile = new File(["hello"], "hello.png", { type: "image/png" });
-      //fireEvent.change(inputFile, { target: { value: imageFile } });
-
+      
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname});
       };
 
       const newBill = new NewBill({
-        document, onNavigate, store: null, localStorage: window.localStorage
+        document, onNavigate, store: mockStore, localStorage: window.localStorage
       })
 
-      
-      const bills = new Bills({
-        document, onNavigate, store: null, localStorage: window.localStorage
-      })
 
-      const handleChangeFile = jest.fn(newBill.handleChangeFile);
       NewBill.handleChangeFile = jest.fn().mockResolvedValue({});
       await userEvent.upload(inputFile, imageFile);
       // Make sure the action was successful
-      //expect(inputFile.files.length).toBe(1);
+      expect(inputFile.files.length).toBe(1);
       //let findText = await waitFor(() => screen.getByText(`Mes notes de frais`) )
       //expect(findText).toBeTruthy()
     })
